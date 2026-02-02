@@ -105,7 +105,7 @@ Deliverables:
 **Tests:**
 - unit tests for preflight checks and error messaging
 
-### Task 2.3 (REVIEW) — Tool visibility (observability), not tool execution
+### Task 2.3 (DONE) — Tool visibility (observability), not tool execution
 
 ### Task 2.4 — Future: move Codex preflight to the Codex engine/provider (enforced centrally)
 **Goal:** ensure *any* Codex-backed run cannot start without passing preflight.
