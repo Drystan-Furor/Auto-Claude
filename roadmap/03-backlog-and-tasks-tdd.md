@@ -75,7 +75,7 @@ Define:
   - rely on Codex’s approvals + allow/deny lists
   - observe/report tool activity at a high level (for UX + audit) without re-implementing tool semantics.
 
-### Task 2.1 (REVIEW) — Codex MCP bootstrap + runbook
+### Task 2.1 (DONE) — Codex MCP bootstrap + runbook
 **Goal:** make it easy and repeatable for a user/workspace to get the same tool surface.
 
 Deliverables:

@@ -1,6 +1,6 @@
 # Epic 2 / Task 2.1 — Codex MCP bootstrap + runbook
 
-Status: IN PROGRESS
+Status: DONE
 Date: 2026-02-02
 
 This runbook standardizes how Auto-Claude (migrating to Auto-Codex) expects **Codex CLI** to be set up for:
