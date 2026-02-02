@@ -9,7 +9,7 @@ Date: 2026-02-02
 
 ## Epic 0 — Baseline safety net (tests before refactor)
 
-### Task 0.1 — Add a minimal “engine contract” test harness
+### Task 0.1 (REVIEW) — Add a minimal “engine contract” test harness
 **Goal:** create a provider-neutral test harness for streaming/tool calls *without changing behavior yet*.
 
 **Test cases (pytest):**
