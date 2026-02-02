@@ -40,7 +40,7 @@ Define:
 - mypy/typing-level tests (if used)
 - a “FakeEngine implements Engine” test
 
-### Task 1.3 (IN PROGRESS) — Refactor `agents/session.py` to depend on `LLMEngine`
+### Task 1.3 (REVIEW) — Refactor `agents/session.py` to depend on `LLMEngine`
 **Plan:**
 - Move Claude SDK–specific streaming parsing into `providers/claude_sdk/engine.py`.
 - `agents/session.py` becomes:

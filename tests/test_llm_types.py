@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from apps.backend.llm.types import (
+from llm.types import (
     TextEvent,
     ToolCall,
     ToolCallEvent,

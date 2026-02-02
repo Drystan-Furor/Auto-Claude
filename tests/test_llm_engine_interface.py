@@ -4,8 +4,8 @@ from typing import AsyncIterator, List
 
 import pytest
 
-from apps.backend.llm.engine import LLMEngine
-from apps.backend.llm.types import StreamEvent, TextEvent, ToolResult
+from llm.engine import LLMEngine
+from llm.types import StreamEvent, TextEvent, ToolResult
 
 
 class FakeEngine(LLMEngine):
