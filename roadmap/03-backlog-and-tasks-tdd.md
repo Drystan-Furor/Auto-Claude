@@ -40,7 +40,7 @@ Define:
 - mypy/typing-level tests (if used)
 - a “FakeEngine implements Engine” test
 
-### Task 1.3 — Refactor `agents/session.py` to depend on `LLMEngine`
+### Task 1.3 (IN PROGRESS) — Refactor `agents/session.py` to depend on `LLMEngine`
 **Plan:**
 - Move Claude SDK–specific streaming parsing into `providers/claude_sdk/engine.py`.
 - `agents/session.py` becomes:
@@ -53,7 +53,7 @@ Define:
 - existing unit tests should pass
 - new harness tests pass
 
-### Task 1.4 — Wrap existing Claude SDK implementation
+### Task 1.4 (REVIEW) — Wrap existing Claude SDK implementation
 **Files:**
 - `apps/backend/llm/providers/claude_sdk/engine.py`
 - `apps/backend/llm/registry.py`
