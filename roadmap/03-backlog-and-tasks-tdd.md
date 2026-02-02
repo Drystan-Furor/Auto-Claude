@@ -35,7 +35,7 @@ Define:
 - serialization/deserialization if stored
 - strict typing + forward compatibility
 
-### Task 1.2 (REVIEW) — Create `apps/backend/llm/engine.py` (interface)
+### Task 1.2 (DONE) — Create `apps/backend/llm/engine.py` (interface)
 **Tests:**
 - mypy/typing-level tests (if used)
 - a “FakeEngine implements Engine” test
