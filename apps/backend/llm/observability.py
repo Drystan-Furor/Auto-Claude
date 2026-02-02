@@ -51,6 +51,7 @@ def observe_event(
     task_logger: object | None,
     phase: object,
     verbose: bool = False,
+    text_entry_type: object = "text",
 ) -> None:
     """Map StreamEvent -> TaskLogger tool/text events.
 
@@ -70,7 +71,7 @@ def observe_event(
         text = ev.text
         if text.strip():
             # Avoid double-printing; session loop handles console output.
-            task_logger.log(text, "text", phase, print_to_console=False)
+            task_logger.log(text, text_entry_type, phase, print_to_console=False)
         return
 
     if isinstance(ev, ToolCallEvent) and ev.tool_call is not None:

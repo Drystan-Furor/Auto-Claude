@@ -13,6 +13,7 @@ from claude_agent_sdk import ClaudeSDKClient
 from debug import debug, debug_detailed, debug_error, debug_section, debug_success
 
 from llm.engine import LLMEngine
+from llm.observability import ToolObservationState, observe_event
 from llm.providers.claude_sdk.engine import ClaudeSDKEngine
 from llm.types import TextEvent, ToolCallEvent, ToolResultEvent
 from insight_extractor import extract_session_insights
@@ -374,6 +375,7 @@ async def run_llm_session(
     print("Sending prompt to LLM engine...\n")
 
     task_logger = get_task_logger(spec_dir)
+    obs_state = ToolObservationState()
     current_tool = None
     message_count = 0
     tool_count = 0
@@ -391,11 +393,19 @@ async def run_llm_session(
             ev_type = type(ev).__name__
             debug_detailed("session", f"Received event #{message_count}", ev_type=ev_type)
 
+            # Persist to task logger (tool/text visibility) in a provider-neutral way.
+            observe_event(
+                ev=ev,
+                state=obs_state,
+                task_logger=task_logger,
+                phase=phase,
+                verbose=verbose,
+                text_entry_type=LogEntryType.TEXT,
+            )
+
             if isinstance(ev, TextEvent):
                 response_text += ev.text
                 print(ev.text, end="", flush=True)
-                if task_logger and ev.text.strip():
-                    task_logger.log(ev.text, LogEntryType.TEXT, phase, print_to_console=False)
 
             elif isinstance(ev, ToolCallEvent) and ev.tool_call is not None:
                 tool_count += 1
@@ -426,9 +436,8 @@ async def run_llm_session(
                     full_input=str(inp)[:500] if inp else None,
                 )
 
-                if task_logger:
-                    task_logger.tool_start(tool_name, tool_input_display, phase, print_to_console=True)
-                else:
+                # Note: Tool start logging is handled by observe_event (above) when task_logger is available.
+                if not task_logger:
                     print(f"\n[Tool: {tool_name}]", flush=True)
 
                 if verbose:
@@ -447,26 +456,10 @@ async def run_llm_session(
                 if is_error and "blocked" in str(result_content).lower():
                     debug_error("session", f"Tool BLOCKED: {current_tool}", result=str(result_content)[:300])
                     print(f"   [BLOCKED] {result_content}", flush=True)
-                    if task_logger and current_tool:
-                        task_logger.tool_end(
-                            current_tool,
-                            success=False,
-                            result="BLOCKED",
-                            detail=str(result_content),
-                            phase=phase,
-                        )
                 elif is_error:
                     error_str = str(result_content)[:500]
                     debug_error("session", f"Tool error: {current_tool}", error=error_str[:200])
                     print(f"   [Error] {error_str}", flush=True)
-                    if task_logger and current_tool:
-                        task_logger.tool_end(
-                            current_tool,
-                            success=False,
-                            result=error_str[:100],
-                            detail=str(result_content),
-                            phase=phase,
-                        )
                 else:
                     debug_detailed(
                         "session",
@@ -479,13 +472,7 @@ async def run_llm_session(
                     else:
                         print("   [Done]", flush=True)
 
-                    if task_logger and current_tool:
-                        detail_content = None
-                        if current_tool in ("Read", "Grep", "Bash", "Edit", "Write"):
-                            rs = str(result_content)
-                            if len(rs) < 50000:
-                                detail_content = rs
-                        task_logger.tool_end(current_tool, success=True, detail=detail_content, phase=phase)
+                # Note: Tool end logging is handled by observe_event (above) when task_logger is available.
 
                 current_tool = None
 

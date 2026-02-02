@@ -76,6 +76,7 @@ def test_observability_logs_text_without_double_print() -> None:
         state=state,
         task_logger=logger,
         phase="coding",
+        text_entry_type="text",
     )
 
     assert logger.calls and logger.calls[0].kind == "log"
