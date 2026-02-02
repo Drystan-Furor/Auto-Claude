@@ -89,7 +89,7 @@ Deliverables:
 - lightweight config parsing/validation tests in backend (if we read config)
 - smoke doc checklist (manual) for “fresh machine can run Codex with MCP”
 
-### Task 2.2 (IN PROGRESS) — Security + approvals alignment
+### Task 2.2 (REVIEW) — Security + approvals alignment
 **Goal:** map Auto-Claude’s security model to Codex controls.
 
 Deliverables:
