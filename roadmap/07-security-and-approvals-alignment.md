@@ -1,6 +1,6 @@
 # Epic 2 / Task 2.2 — Security + approvals alignment (Auto-Claude ↔ Codex)
 
-Status: IN PROGRESS
+Status: DONE
 Date: 2026-02-02
 
 Goal: map Auto-Claude’s existing security model to **Codex-native** controls:
