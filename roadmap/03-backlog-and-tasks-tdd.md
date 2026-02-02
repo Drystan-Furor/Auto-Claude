@@ -25,7 +25,7 @@ Date: 2026-02-02
 
 ## Epic 1 — Introduce `LLMEngine` abstraction (Claude remains the engine)
 
-### Task 1.1 (REVIEW) — Create `apps/backend/llm/types.py`
+### Task 1.1 (DONE) — Create `apps/backend/llm/types.py`
 Define:
 - `StreamEvent` union types
 - `ToolCall` (name, input, id)
@@ -35,7 +35,7 @@ Define:
 - serialization/deserialization if stored
 - strict typing + forward compatibility
 
-### Task 1.2 — Create `apps/backend/llm/engine.py` (interface)
+### Task 1.2 (REVIEW) — Create `apps/backend/llm/engine.py` (interface)
 **Tests:**
 - mypy/typing-level tests (if used)
 - a “FakeEngine implements Engine” test
