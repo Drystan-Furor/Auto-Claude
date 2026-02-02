@@ -103,15 +103,18 @@ With Codex-native MCP:
 
 Even with Codex doing the work, Auto-Claude should fail fast with actionable errors.
 
-Proposed checks:
+Implemented checks (module): `apps/backend/codex/preflight.py`
+
+Checks:
 1) Codex binary exists (`codex --version`)
 2) Auth present:
-   - if `cli_auth_credentials_store=file|auto`: check `~/.codex/auth.json` exists
-   - otherwise: instruct user to set `cli_auth_credentials_store="file"` or log in
-3) If MVP requires MCP servers:
-   - check `~/.codex/config.toml` has required `[mcp_servers.<name>]` entries
+   - primary: parse `codex login status`
+   - fallback: auth cache file exists at `~/.codex/auth.json` (presence only; **never read token contents**)
+   - handles the edge case where the status text contains `"Not logged in"` (which includes the substring `"logged in"`)
+3) Optional MCP enforcement:
+   - if required MCP servers are specified, verify `~/.codex/config.toml` exists and contains `[mcp_servers.<name>]` sections (string search; avoids secret parsing)
 
-> Implementation note: these checks must not read/print token contents.
+Security note: these checks must not read/print token contents.
 
 ---
 
