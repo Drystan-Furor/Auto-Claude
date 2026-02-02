@@ -53,7 +53,7 @@ Define:
 - existing unit tests should pass
 - new harness tests pass
 
-### Task 1.4 (REVIEW) — Wrap existing Claude SDK implementation
+### Task 1.4 (DONE) — Wrap existing Claude SDK implementation
 **Files:**
 - `apps/backend/llm/providers/claude_sdk/engine.py`
 - `apps/backend/llm/registry.py`
