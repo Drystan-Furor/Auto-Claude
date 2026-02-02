@@ -63,34 +63,59 @@ Define:
 
 ---
 
-## Epic 2 — Tool execution becomes a first-class backend component
+## Epic 2 — Re-scope: Codex-native tools + approvals (minimal backend ToolRunner)
 
-### Task 2.1 — Create `ToolRunner`
-**Goal:** unify tool execution across providers.
+**Decision:** Prefer **Codex-native** tool execution (MCP + Codex approvals) as much as possible.
 
-Responsibilities:
-- validate tool inputs (reuse existing `security/*`)
-- execute:
-  - file ops
-  - bash (sandboxed)
-  - web fetch/search
-  - MCP calls
+**What changes:**
+- We do **not** build a full provider-neutral Python ToolRunner as the primary execution path.
+- Instead, we ensure the chassis can:
+  - configure Codex (auth, trusted projects, config.toml)
+  - set up MCP servers
+  - rely on Codex’s approvals + allow/deny lists
+  - observe/report tool activity at a high level (for UX + audit) without re-implementing tool semantics.
+
+### Task 2.1 — Codex MCP bootstrap + runbook
+**Goal:** make it easy and repeatable for a user/workspace to get the same tool surface.
+
+Deliverables:
+- A documented baseline `~/.codex/config.toml` (and `.codex/config.toml` for trusted projects)
+- Recommended MCP servers for MVP (or explicitly “none”)
+- Document OAuth flows:
+  - `codex mcp login` for MCP servers
+  - `codex login --device-auth` for headless
 
 **Tests:**
-- allowlist enforcement: disallow forbidden bash commands
-- filesystem restrictions: cannot escape project_dir
-- tool result formatting stable
+- lightweight config parsing/validation tests in backend (if we read config)
+- smoke doc checklist (manual) for “fresh machine can run Codex with MCP”
 
-### Task 2.2 — Adapt existing tool registry
-Current tools are defined as Agent SDK tools in `agents/tools_pkg/tools/*`.
+### Task 2.2 — Security + approvals alignment
+**Goal:** map Auto-Claude’s security model to Codex controls.
 
-**Decision point:**
-- Either keep Agent SDK tools for Claude and add a parallel non-SDK tool registry for OpenAI, OR
-- Extract tool implementations into provider-neutral Python functions and adapt both SDK and OpenAI tool schemas.
+Deliverables:
+- Document how Auto-Claude restrictions translate to:
+  - Codex approval modes
+  - MCP enabled_tools/disabled_tools
+  - trusted project boundaries
+- Add backend-side preflight checks (non-invasive):
+  - Codex installed
+  - user authenticated (ChatGPT OAuth)
+  - required MCP servers configured (if any)
 
-**TDD deliverable:**
-- At least 3 tools extracted and runnable without Agent SDK:
-  - `Read`, `Write`, `Bash`
+**Tests:**
+- unit tests for preflight checks and error messaging
+
+### Task 2.3 — Tool visibility (observability), not tool execution
+**Goal:** surface “what tools were used” to the UI/logs without executing tools in Python.
+
+Deliverables:
+- minimal event mapping for:
+  - tool call started
+  - tool call completed (success/error)
+- persisted logs that can be shown in the Kanban/task UI
+
+**Tests:**
+- contract tests that tool events are emitted in-order and are stable
 
 ---
 
