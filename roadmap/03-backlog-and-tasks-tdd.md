@@ -106,6 +106,21 @@ Deliverables:
 - unit tests for preflight checks and error messaging
 
 ### Task 2.3 — Tool visibility (observability), not tool execution
+
+### Task 2.4 — Future: move Codex preflight to the Codex engine/provider (enforced centrally)
+**Goal:** ensure *any* Codex-backed run cannot start without passing preflight.
+
+Rationale:
+- Option A (current): preflight lives at the orchestrator entrypoint (`run_autonomous_agent`).
+- Option C (future): preflight lives inside the Codex engine/provider implementation, so *all* call sites are covered (builds, planner, reviews, spec pipeline, etc.).
+
+Deliverables:
+- Codex engine/provider calls `codex_preflight()` (or equivalent) before first execution
+- Unified error surface (CLI + UI)
+
+Tests:
+- unit test that Codex engine refuses to start if preflight fails
+
 **Goal:** surface “what tools were used” to the UI/logs without executing tools in Python.
 
 Deliverables:

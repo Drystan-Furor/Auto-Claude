@@ -105,6 +105,8 @@ Even with Codex doing the work, Auto-Claude should fail fast with actionable err
 
 Implemented checks (module): `apps/backend/codex/preflight.py`
 
+Wired entrypoint (Option A): `apps/backend/agents/coder.py::run_autonomous_agent` (only when `LLM_PROVIDER` is set to a Codex variant).
+
 Checks:
 1) Codex binary exists (`codex --version`)
 2) Auth present:

@@ -65,6 +65,8 @@ from .base import (
 )
 from .memory_manager import debug_memory_system_status, get_graphiti_context
 from .session import post_session_processing, run_agent_session
+
+from codex.preflight import codex_preflight
 from .utils import (
     find_phase_for_subtask,
     get_commit_count,
@@ -101,6 +103,19 @@ async def run_autonomous_agent(
     # Set environment variable for security hooks to find the correct project directory
     # This is needed because os.getcwd() may return the wrong directory in worktree mode
     os.environ[PROJECT_DIR_ENV_VAR] = str(project_dir.resolve())
+
+    # --- Codex preflight (Epic 2 / Task 2.2) ---
+    # We only enforce Codex preflight when the backend is configured to use Codex.
+    # This keeps behavior unchanged for Claude runs.
+    llm_provider = os.environ.get("LLM_PROVIDER", "claude").lower()
+    if llm_provider in ("codex", "codex_cli", "codex_oauth"):
+        preflight = codex_preflight()
+        if not preflight.ok:
+            print_status("Codex preflight failed", "error")
+            for e in preflight.errors:
+                print(f"  - {e}")
+            # Raise SystemExit to stop the run early with a clear message.
+            raise SystemExit(1)
 
     # Initialize recovery manager (handles memory persistence)
     recovery_manager = RecoveryManager(spec_dir, project_dir)
