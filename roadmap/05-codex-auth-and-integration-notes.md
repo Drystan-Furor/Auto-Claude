@@ -113,23 +113,44 @@ Cons:
 
 ---
 
-## 5) New concrete tasks to add to roadmap (missing today)
+## 5) Decision (confirmed)
+
+✅ **Tool strategy: Codex-native (MCP + Codex approvals) as much as possible.**
+
+Rationale:
+- Codex already ships MCP management + approvals UX.
+- We avoid re-implementing tool-calling semantics in the Auto-Claude backend.
+- The “chassis” remains: Kanban/spec/worktree isolation/orchestration. The “engine+tools” become Codex.
+
+Primary consequence:
+- Auto-Claude should treat Codex as the executor that can read/edit/run and call MCP tools, and focus on:
+  - producing good plans/specs
+  - curating the project context
+  - gating/approvals policy at the Codex layer (and via Codex config)
+
+---
+
+## 6) New concrete tasks to add to roadmap (missing today)
 
 1) **Codex auth detector (backend + frontend):**
    - determine if user is logged in via ChatGPT
    - surface status in UI
+   - document/optionally enforce `forced_login_method = "chatgpt"`
 
 2) **Provider runtime selection:**
    - `LLM_PROVIDER=codex_oauth` (and optionally keep `claude` during migration)
 
-3) **Codex SDK sidecar / bridge:**
-   - implement `codex-engine` in Node
-   - define JSON-RPC-ish protocol for:
-     - start thread
-     - run prompt
-     - emit stream events
-     - request tool execution (if we keep tools in Python)
+3) **Codex-native MCP bootstrap:**
+   - decide which MCP servers are required for MVP (if any)
+   - add `codex mcp add ...` examples + recommended `~/.codex/config.toml` snippets
+   - document `codex mcp login` for OAuth-based MCP servers
 
-4) **Decide tool strategy:**
-   - Codex-native MCP vs Auto-Claude tool runner
+4) **Codex execution strategy:**
+   - Prefer Codex SDK (Node) for programmatic control where needed
+   - Otherwise use `codex exec` for non-interactive runs
+   - Do **not** implement a Python ToolRunner-to-LLM tool-call bridge for MVP
+
+5) **Security/approvals alignment:**
+   - map Auto-Claude security model to Codex approval modes + MCP allow/deny lists
+   - define “trusted project” behavior for `.codex/config.toml`
 
