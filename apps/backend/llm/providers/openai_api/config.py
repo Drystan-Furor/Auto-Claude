@@ -10,9 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import os
 
-
-class OpenAIConfigError(ValueError):
-    pass
+from llm.errors import AuthError, ConfigError
 
 
 @dataclass(frozen=True)
@@ -28,8 +26,13 @@ class OpenAIConfig:
         base_url = os.environ.get("OPENAI_BASE_URL", "").strip() or None
 
         if not api_key:
-            raise OpenAIConfigError(
-                "Missing OPENAI_API_KEY. Set OPENAI_API_KEY or choose a different provider."
+            # Task 3.2: missing key should be an AuthError (not a generic ValueError)
+            raise AuthError(
+                "Missing OPENAI_API_KEY. Set OPENAI_API_KEY to use provider=openai."
             )
+
+        if not model:
+            # Should be unreachable due to defaulting, but keep explicit.
+            raise ConfigError("Missing OPENAI_MODEL")
 
         return cls(api_key=api_key, model=model, base_url=base_url)

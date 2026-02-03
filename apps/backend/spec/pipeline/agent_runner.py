@@ -113,7 +113,55 @@ class AgentRunner:
                 context_length=len(additional_context),
             )
 
-        # Create client with thinking budget
+        # Provider selection (Epic 3)
+        import os
+
+        llm_provider = os.environ.get("LLM_PROVIDER", "claude").lower()
+
+        if llm_provider in ("openai", "openai_api"):
+            debug(
+                "agent_runner",
+                "Creating OpenAI engine...",
+                provider=llm_provider,
+            )
+            from llm.registry import create_engine
+            from llm.types import TextEvent, ToolCallEvent
+            from llm.errors import AuthError, ConfigError
+
+            try:
+                engine = create_engine("openai_api")
+                await engine.start(prompt)
+            except (AuthError, ConfigError) as e:
+                # Exact Task 3.2 behavior: explicit, credential-specific errors.
+                debug_error("agent_runner", "OpenAI configuration error", error=str(e))
+                return False, str(e)
+
+            response_text = ""
+            async for ev in engine.stream():
+                if isinstance(ev, TextEvent):
+                    response_text += ev.text
+                    print(ev.text, end="", flush=True)
+                    if self.task_logger and ev.text.strip():
+                        self.task_logger.log(
+                            ev.text,
+                            LogEntryType.TEXT,
+                            LogPhase.PLANNING,
+                            print_to_console=False,
+                        )
+                elif isinstance(ev, ToolCallEvent) and ev.tool_call is not None:
+                    # Tools are not yet wired for OpenAI in the spec pipeline runner.
+                    # Fail clearly rather than silently ignoring.
+                    msg = (
+                        "OpenAI provider requested a tool call, but tool execution "
+                        "is not yet implemented for the OpenAI engine in this runner. "
+                        f"Tool: {ev.tool_call.name}"
+                    )
+                    debug_error("agent_runner", msg)
+                    return False, msg
+
+            return True, response_text
+
+        # Default path: Claude SDK client
         debug(
             "agent_runner",
             "Creating Claude SDK client...",
