@@ -23,9 +23,9 @@ try:
 except (ImportError, ValueError, SystemError):
     from analysis.test_discovery import TestDiscovery
     from category_utils import map_category
-    from context_gatherer import PRContext
+    from ..context_gatherer import PRContext
     from core.client import create_client
-    from models import PRReviewFinding, ReviewSeverity
+from ..models import PRReviewFinding, ReviewSeverity
 
 logger = logging.getLogger(__name__)
 

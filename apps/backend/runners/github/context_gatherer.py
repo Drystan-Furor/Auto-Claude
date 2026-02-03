@@ -31,7 +31,7 @@ except (ImportError, ValueError, SystemError):
     # Import from core.io_utils directly to avoid circular import with services package
     # (services/__init__.py imports pr_review_engine which imports context_gatherer)
     from core.io_utils import safe_print
-    from gh_client import GHClient, PRTooLargeError
+    from .gh_client import GHClient, PRTooLargeError
 
 # Validation patterns for git refs and paths (defense-in-depth)
 # These patterns allow common valid characters while rejecting potentially dangerous ones
@@ -87,10 +87,7 @@ def _validate_file_path(path: str) -> bool:
 
 
 if TYPE_CHECKING:
-    try:
-        from .models import FollowupReviewContext, PRReviewResult
-    except (ImportError, ValueError, SystemError):
-        from models import FollowupReviewContext, PRReviewResult
+    from .models import FollowupReviewContext, PRReviewResult
 
 
 @dataclass
@@ -1346,10 +1343,7 @@ class FollowupContextGatherer:
             FollowupReviewContext with changes since last review
         """
         # Import here to avoid circular imports
-        try:
-            from .models import FollowupReviewContext
-        except (ImportError, ValueError, SystemError):
-            from models import FollowupReviewContext
+        from .models import FollowupReviewContext
 
         previous_sha = self.previous_review.reviewed_commit_sha
 

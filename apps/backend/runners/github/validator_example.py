@@ -8,7 +8,7 @@ into a PR review system to improve finding quality.
 
 from pathlib import Path
 
-from models import PRReviewFinding, ReviewCategory, ReviewSeverity
+from .models import PRReviewFinding, ReviewCategory, ReviewSeverity
 from output_validator import FindingValidator
 
 

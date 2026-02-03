@@ -7,7 +7,7 @@ Demonstrates how to use the bot detection system to prevent infinite loops.
 
 from pathlib import Path
 
-from models import GitHubRunnerConfig
+from .models import GitHubRunnerConfig
 from orchestrator import GitHubOrchestrator
 
 

@@ -31,56 +31,30 @@ from typing import Any
 # See: https://github.com/anthropics/claude-code/issues/8697
 from claude_agent_sdk import AgentDefinition  # noqa: F401
 
-try:
-    from ...core.client import create_client
-    from ...phase_config import get_thinking_budget, resolve_model_id
-    from ..context_gatherer import PRContext, _validate_git_ref
-    from ..gh_client import GHClient
-    from ..models import (
-        BRANCH_BEHIND_BLOCKER_MSG,
-        BRANCH_BEHIND_REASONING,
-        GitHubRunnerConfig,
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewSeverity,
-    )
-    from .agent_utils import create_working_dir_injector
-    from .category_utils import map_category
-    from .io_utils import safe_print
-    from .pr_worktree_manager import PRWorktreeManager
-    from .pydantic_models import (
-        AgentAgreement,
-        FindingValidationResponse,
-        ParallelOrchestratorResponse,
-        SpecialistResponse,
-    )
-    from .sdk_utils import process_sdk_stream
-except (ImportError, ValueError, SystemError):
-    from context_gatherer import PRContext, _validate_git_ref
-    from core.client import create_client
-    from gh_client import GHClient
-    from models import (
-        BRANCH_BEHIND_BLOCKER_MSG,
-        BRANCH_BEHIND_REASONING,
-        GitHubRunnerConfig,
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewSeverity,
-    )
-    from phase_config import get_thinking_budget, resolve_model_id
-    from services.agent_utils import create_working_dir_injector
-    from services.category_utils import map_category
-    from services.io_utils import safe_print
-    from services.pr_worktree_manager import PRWorktreeManager
-    from services.pydantic_models import (
-        AgentAgreement,
-        FindingValidationResponse,
-        ParallelOrchestratorResponse,
-        SpecialistResponse,
-    )
-    from services.sdk_utils import process_sdk_stream
+from core.client import create_client
+from phase_config import get_thinking_budget, resolve_model_id
+from ..context_gatherer import PRContext, _validate_git_ref
+from ..gh_client import GHClient
+from ..models import (
+    BRANCH_BEHIND_BLOCKER_MSG,
+    BRANCH_BEHIND_REASONING,
+    GitHubRunnerConfig,
+    MergeVerdict,
+    PRReviewFinding,
+    PRReviewResult,
+    ReviewSeverity,
+)
+from .agent_utils import create_working_dir_injector
+from .category_utils import map_category
+from .io_utils import safe_print
+from .pr_worktree_manager import PRWorktreeManager
+from .pydantic_models import (
+    AgentAgreement,
+    FindingValidationResponse,
+    ParallelOrchestratorResponse,
+    SpecialistResponse,
+)
+from .sdk_utils import process_sdk_stream
 
 
 # =============================================================================

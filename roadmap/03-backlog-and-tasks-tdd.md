@@ -136,7 +136,43 @@ Deliverables:
 
 ## Epic 3 — Implement OpenAI engine (API transport)
 
+### Reality check (2026-02-03)
+What we implemented so far:
+- Added `apps/backend/llm/providers/openai_api/engine.py` (`OpenAIAPIEngine`) using **Responses API streaming**.
+  - Maps `response.output_text.delta` → `TextEvent`
+  - Maps function call args streaming → `ToolCallEvent`
+  - Supports `send_tool_result()` via `function_call_output` + `previous_response_id`
+- Added OpenAI env config parsing in `openai_api/config.py`.
+  - Missing `OPENAI_API_KEY` raises **AuthError** (new shared `llm/errors.py`).
+- Wired OpenAI selection in **spec pipeline runner** (`spec/pipeline/agent_runner.py`) when `LLM_PROVIDER=openai`.
+  - Current limitation: tool calls in this runner are **not executed yet**; we fail clearly if a tool is requested.
+- Test infra insight:
+  - The repo’s async tests require `pytest-asyncio`.
+  - Added `pytest.ini` with `asyncio_mode=auto`.
+
+What remains for MVP:
+- The MVP definition requires the **build loop** (not only spec pipeline) to run under `LLM_PROVIDER=openai`.
+- We still need a stable strategy for tool-calling:
+  - Either implement a minimal provider-neutral ToolRunner (Epic 1.3 intent), or
+  - Define an OpenAI-specific tool execution path (and later align with Codex-native tools).
+
+---
+
+### Task 3.0 (NEW) — Ensure async test support in backend
+**Goal:** running pytest locally should support async contract tests.
+
+Deliverables:
+- Add `pytest-asyncio` as a backend test dependency
+- Add `pytest.ini` to configure `asyncio_mode=auto` and register the `asyncio` mark
+
+Tests:
+- `pytest -q llm/providers/openai_api` runs without plugin errors
+
+---
+
 ### Task 3.1 — Implement `openai_api` provider
+**Status:** PARTIAL (engine skeleton + fake-client contract tests exist)
+
 **Scope:**
 - Use OpenAI tool calling (Responses API preferred; fallback to Chat Completions if needed).
 - Support:
@@ -144,14 +180,21 @@ Deliverables:
   - tool call requests
   - continued conversation after tool result
 
-**Tests (contract tests):**
-- Run against a mocked OpenAI server or VCR cassette
-- Verify tool call roundtrip
+**Done:**
+- Responses streaming → provider-neutral events
+- Tool-call roundtrip logic (via `send_tool_result()`)
+
+**Remaining:**
+- Add contract tests against a mocked HTTP server or VCR cassette (real API surface)
+- Add Chat Completions fallback if Responses API isn’t available
+- Decide/tool mapping contract: OpenAI tool schema ↔ Auto-Claude tool registry
 
 **Notes:**
 - Keep a compatibility mapping between current tool names and OpenAI function-calling schema.
 
 ### Task 3.2 — Add OpenAI config resolution
+**Status:** DONE (env parsing + explicit AuthError)
+
 Add env parsing:
 - `OPENAI_API_KEY`
 - `OPENAI_MODEL`
@@ -160,6 +203,36 @@ Add env parsing:
 **Tests:**
 - invalid config errors are explicit
 - missing key produces AuthError
+
+---
+
+### Task 3.3 (NEW) — Wire OpenAI provider into the main build loop
+**Goal:** meet MVP requirement “Backend can run a build using `LLM_PROVIDER=openai`”.
+
+Deliverables:
+- The main agent session/chassis (build + QA) should instantiate engines through `llm.registry.create_engine()` based on `LLM_PROVIDER`.
+- Ensure OpenAI uses the same logging/observability mapping (`llm/observability.py`).
+
+Tests:
+- A small integration test that runs a minimal “turn” through the build loop with a fake OpenAI client.
+
+---
+
+### Task 3.4 (NEW) — Decide and implement tool execution strategy for OpenAI
+**Goal:** when OpenAI requests a tool call, the system can execute it and continue.
+
+Options (pick one for MVP):
+- **A) Minimal provider-neutral ToolRunner** (aligns with Epic 1.3 intent)
+  - Execute existing tools (MCP hooks / bash sandbox) and feed results back.
+- **B) OpenAI-only tool executor**
+  - Provide a narrow mapping for a small allowlist of tools used in MVP.
+
+Deliverables:
+- Tool name + JSON schema mapping (Auto-Claude tool registry → OpenAI function definitions)
+- Tool call → execution → `ToolResult` → `send_tool_result()` loop
+
+Tests:
+- Contract test: tool call requested → tool executed → engine continues and produces text
 
 ---
 

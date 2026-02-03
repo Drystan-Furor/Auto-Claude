@@ -24,7 +24,7 @@ try:
     from .file_lock import locked_json_update
 except (ImportError, ValueError, SystemError):
     from audit import ActorType, AuditLogger
-    from file_lock import locked_json_update
+    from .file_lock import locked_json_update
 
 
 class OverrideType(str, Enum):

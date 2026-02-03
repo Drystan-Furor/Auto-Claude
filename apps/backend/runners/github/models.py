@@ -19,7 +19,7 @@ from pathlib import Path
 try:
     from .file_lock import locked_json_update, locked_json_write
 except (ImportError, ValueError, SystemError):
-    from file_lock import locked_json_update, locked_json_write
+    from .file_lock import locked_json_update, locked_json_write
 
 
 class ReviewSeverity(str, Enum):

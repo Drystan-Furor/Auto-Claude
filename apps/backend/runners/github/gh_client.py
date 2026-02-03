@@ -25,7 +25,7 @@ from core.gh_executable import get_gh_executable
 try:
     from .rate_limiter import RateLimiter, RateLimitExceeded
 except (ImportError, ValueError, SystemError):
-    from rate_limiter import RateLimiter, RateLimitExceeded
+    from .rate_limiter import RateLimiter, RateLimitExceeded
 
 # Configure logger
 logger = logging.getLogger(__name__)

@@ -14,12 +14,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Use direct file import to avoid package import issues
-_github_dir = Path(__file__).parent
-if str(_github_dir) not in sys.path:
-    sys.path.insert(0, str(_github_dir))
-
-from bot_detection import BotDetectionState, BotDetector
+from .bot_detection import BotDetectionState, BotDetector
 
 
 @pytest.fixture
@@ -419,7 +414,7 @@ class TestGhExecutableDetection:
 
     def test_get_bot_username_with_gh_not_found(self, temp_state_dir):
         """Test _get_bot_username when gh CLI is not found."""
-        with patch("bot_detection.get_gh_executable", return_value=None):
+        with patch("runners.github.bot_detection.get_gh_executable", return_value=None):
             detector = BotDetector(
                 state_dir=temp_state_dir,
                 bot_token="fake-token",
@@ -432,7 +427,7 @@ class TestGhExecutableDetection:
     def test_get_bot_username_with_detected_gh(self, temp_state_dir):
         """Test _get_bot_username when gh CLI is found."""
         mock_gh_path = str(temp_state_dir / "gh")
-        with patch("bot_detection.get_gh_executable", return_value=mock_gh_path):
+        with patch("runners.github.bot_detection.get_gh_executable", return_value=mock_gh_path):
             with patch("subprocess.run") as mock_run:
                 mock_run.return_value = MagicMock(
                     returncode=0,
@@ -460,7 +455,7 @@ class TestGhExecutableDetection:
         # This test verifies _get_bot_username uses whatever get_gh_executable returns
         mock_gh_path = str(temp_state_dir / "gh")
 
-        with patch("bot_detection.get_gh_executable", return_value=mock_gh_path):
+        with patch("runners.github.bot_detection.get_gh_executable", return_value=mock_gh_path):
             with patch("subprocess.run") as mock_run:
                 mock_run.return_value = MagicMock(
                     returncode=0,
@@ -485,7 +480,7 @@ class TestGhExecutableDetection:
     def test_get_bot_username_with_api_error(self, temp_state_dir):
         """Test _get_bot_username when gh api command fails."""
         mock_gh_path = str(temp_state_dir / "gh")
-        with patch("bot_detection.get_gh_executable", return_value=mock_gh_path):
+        with patch("runners.github.bot_detection.get_gh_executable", return_value=mock_gh_path):
             with patch("subprocess.run") as mock_run:
                 mock_run.return_value = MagicMock(
                     returncode=1,
@@ -504,7 +499,7 @@ class TestGhExecutableDetection:
     def test_get_bot_username_with_subprocess_timeout(self, temp_state_dir):
         """Test _get_bot_username when subprocess times out."""
         mock_gh_path = str(temp_state_dir / "gh")
-        with patch("bot_detection.get_gh_executable", return_value=mock_gh_path):
+        with patch("runners.github.bot_detection.get_gh_executable", return_value=mock_gh_path):
             with patch(
                 "subprocess.run", side_effect=subprocess.TimeoutExpired("gh", 5)
             ):

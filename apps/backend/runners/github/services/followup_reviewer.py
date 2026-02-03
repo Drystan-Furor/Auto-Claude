@@ -25,32 +25,18 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from ..models import FollowupReviewContext, GitHubRunnerConfig
 
-try:
-    from ..gh_client import GHClient
-    from ..models import (
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewCategory,
-        ReviewSeverity,
-    )
-    from .category_utils import map_category
-    from .io_utils import safe_print
-    from .prompt_manager import PromptManager
-    from .pydantic_models import FollowupReviewResponse
-except (ImportError, ValueError, SystemError):
-    from gh_client import GHClient
-    from models import (
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewCategory,
-        ReviewSeverity,
-    )
-    from services.category_utils import map_category
-    from services.io_utils import safe_print
-    from services.prompt_manager import PromptManager
-    from services.pydantic_models import FollowupReviewResponse
+from ..gh_client import GHClient
+from ..models import (
+    MergeVerdict,
+    PRReviewFinding,
+    PRReviewResult,
+    ReviewCategory,
+    ReviewSeverity,
+)
+from .category_utils import map_category
+from .io_utils import safe_print
+from .prompt_manager import PromptManager
+from .pydantic_models import FollowupReviewResponse
 
 logger = logging.getLogger(__name__)
 

@@ -82,9 +82,9 @@ from debug import debug_error
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Now import models and orchestrator directly (they use relative imports internally)
-from models import GitHubRunnerConfig
+from .models import GitHubRunnerConfig
 from orchestrator import GitHubOrchestrator, ProgressCallback
-from services.io_utils import safe_print
+from .services.io_utils import safe_print
 
 
 def print_progress(callback: ProgressCallback) -> None:

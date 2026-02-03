@@ -8,7 +8,7 @@ Tests for GitHubPermissionChecker and permission verification.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from permissions import GitHubPermissionChecker, PermissionCheckResult, PermissionError
+from .permissions import GitHubPermissionChecker, PermissionCheckResult, PermissionError
 
 
 class MockGitHubClient:

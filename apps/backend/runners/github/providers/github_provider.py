@@ -17,7 +17,7 @@ from typing import Any
 try:
     from ..gh_client import GHClient
 except (ImportError, ValueError, SystemError):
-    from gh_client import GHClient
+    from ..gh_client import GHClient
 
 from .protocol import (
     IssueData,

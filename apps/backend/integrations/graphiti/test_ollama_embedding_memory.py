@@ -15,6 +15,9 @@ The test covers:
 
 Prerequisites:
     1. Install Ollama: https://ollama.ai/
+
+NOTE: This file is primarily an integration test / diagnostic script.
+It is skipped by default unless RUN_GRAPHITI_TESTS=1.
     2. Pull an embedding model:
        ollama pull embeddinggemma    # 768 dimensions (lightweight)
        ollama pull nomic-embed-text  # 768 dimensions (good quality)
@@ -53,6 +56,13 @@ import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.skipif(
+    os.environ.get("RUN_GRAPHITI_TESTS", "").lower() not in ("1", "true", "yes"),
+    reason="Graphiti integration tests are disabled by default. Set RUN_GRAPHITI_TESTS=1 to run.",
+)
 
 # Add auto-claude to path
 auto_claude_dir = Path(__file__).parent.parent.parent

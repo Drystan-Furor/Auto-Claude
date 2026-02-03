@@ -3,6 +3,9 @@
 Test Script for Memory Integration with LadybugDB
 =================================================
 
+NOTE: This file is primarily an integration test / diagnostic script.
+It is skipped by default unless RUN_GRAPHITI_TESTS=1.
+
 This script tests the memory layer (graph + semantic search) to verify
 data is being saved and retrieved correctly from LadybugDB (embedded Kuzu).
 
@@ -38,6 +41,13 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.skipif(
+    os.environ.get("RUN_GRAPHITI_TESTS", "").lower() not in ("1", "true", "yes"),
+    reason="Graphiti integration tests are disabled by default. Set RUN_GRAPHITI_TESTS=1 to run.",
+)
 
 # Add auto-claude to path
 auto_claude_dir = Path(__file__).parent.parent.parent

@@ -15,10 +15,10 @@ import json
 import sys
 from dataclasses import asdict
 
-from context_gatherer import AI_BOT_PATTERNS, AIBotComment
+from .context_gatherer import AI_BOT_PATTERNS, AIBotComment
 
 # Direct imports (avoid parent __init__.py issues)
-from models import (
+from .models import (
     AICommentTriage,
     AICommentVerdict,
     MergeVerdict,

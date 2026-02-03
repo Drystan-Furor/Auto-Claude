@@ -8,7 +8,7 @@ Demonstrates real-world usage patterns for the file locking system.
 import asyncio
 from pathlib import Path
 
-from models import (
+from .models import (
     AutoFixState,
     AutoFixStatus,
     PRReviewFinding,
@@ -242,7 +242,7 @@ async def example_error_handling():
 
     github_dir = Path(".auto-claude/github")
 
-    from file_lock import FileLockTimeout, locked_json_write
+    from .file_lock import FileLockTimeout, locked_json_write
 
     async def save_with_retry(filepath: Path, data: dict, max_retries: int = 3):
         """Save with automatic retry on lock timeout."""

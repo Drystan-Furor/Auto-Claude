@@ -18,64 +18,33 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-try:
-    # When imported as part of package
-    from .bot_detection import BotDetector
-    from .context_gatherer import PRContext, PRContextGatherer
-    from .gh_client import GHClient
-    from .models import (
-        BRANCH_BEHIND_BLOCKER_MSG,
-        BRANCH_BEHIND_REASONING,
-        AICommentTriage,
-        AICommentVerdict,
-        AutoFixState,
-        GitHubRunnerConfig,
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewCategory,
-        ReviewSeverity,
-        StructuralIssue,
-        TriageResult,
-    )
-    from .permissions import GitHubPermissionChecker
-    from .rate_limiter import RateLimiter
-    from .services import (
-        AutoFixProcessor,
-        BatchProcessor,
-        PRReviewEngine,
-        TriageEngine,
-    )
-    from .services.io_utils import safe_print
-except (ImportError, ValueError, SystemError):
-    # When imported directly (runner.py adds github dir to path)
-    from bot_detection import BotDetector
-    from context_gatherer import PRContext, PRContextGatherer
-    from gh_client import GHClient
-    from models import (
-        BRANCH_BEHIND_BLOCKER_MSG,
-        BRANCH_BEHIND_REASONING,
-        AICommentTriage,
-        AICommentVerdict,
-        AutoFixState,
-        GitHubRunnerConfig,
-        MergeVerdict,
-        PRReviewFinding,
-        PRReviewResult,
-        ReviewCategory,
-        ReviewSeverity,
-        StructuralIssue,
-        TriageResult,
-    )
-    from permissions import GitHubPermissionChecker
-    from rate_limiter import RateLimiter
-    from services import (
-        AutoFixProcessor,
-        BatchProcessor,
-        PRReviewEngine,
-        TriageEngine,
-    )
-    from services.io_utils import safe_print
+from .bot_detection import BotDetector
+from .context_gatherer import PRContext, PRContextGatherer
+from .gh_client import GHClient
+from .models import (
+    BRANCH_BEHIND_BLOCKER_MSG,
+    BRANCH_BEHIND_REASONING,
+    AICommentTriage,
+    AICommentVerdict,
+    AutoFixState,
+    GitHubRunnerConfig,
+    MergeVerdict,
+    PRReviewFinding,
+    PRReviewResult,
+    ReviewCategory,
+    ReviewSeverity,
+    StructuralIssue,
+    TriageResult,
+)
+from .permissions import GitHubPermissionChecker
+from .rate_limiter import RateLimiter
+from .services import (
+    AutoFixProcessor,
+    BatchProcessor,
+    PRReviewEngine,
+    TriageEngine,
+)
+from .services.io_utils import safe_print
 
 
 @dataclass
@@ -660,7 +629,7 @@ class GitHubOrchestrator:
                 from .context_gatherer import FollowupContextGatherer
                 from .services.followup_reviewer import FollowupReviewer
             except (ImportError, ValueError, SystemError):
-                from context_gatherer import FollowupContextGatherer
+                from .context_gatherer import FollowupContextGatherer
                 from services.followup_reviewer import FollowupReviewer
 
             # Gather follow-up context

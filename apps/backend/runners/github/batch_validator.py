@@ -127,30 +127,14 @@ class BatchValidator:
     def _resolve_model(self, model: str) -> str:
         """Resolve model shorthand via phase_config.resolve_model_id()."""
         try:
-            # Use the established try/except pattern for imports (matching
-            # parallel_orchestrator_reviewer.py and other files in runners/github/services/)
-            # This ensures consistency across the codebase and proper caching in sys.modules.
-            from ..phase_config import resolve_model_id
+            from phase_config import resolve_model_id
 
             return resolve_model_id(model)
-        except (ImportError, ValueError, SystemError):
-            # Fallback to absolute import - wrap in try/except for safety
-            try:
-                from phase_config import resolve_model_id
-
-                return resolve_model_id(model)
-            except Exception as e:
-                # Log and return original model as final fallback
-                logger.debug(
-                    f"Fallback import failed, using original model '{model}': {e}"
-                )
-                return model
         except Exception as e:
-            # Log at debug level to aid diagnosis without polluting normal output
+            # Keep validation robust even if phase_config can't be imported.
             logger.debug(
-                f"Model resolution via phase_config failed, using original model '{model}': {e}"
+                f"Model resolution failed, using original model '{model}': {e}"
             )
-            # Fallback to returning the original model string
             return model
 
     def _format_issues(self, issues: list[dict[str, Any]]) -> str:
