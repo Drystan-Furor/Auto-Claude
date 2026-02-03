@@ -34,4 +34,15 @@ def create_engine(provider: str, **kwargs) -> LLMEngine:
             raise ValueError("ClaudeSDKEngine requires client=<ClaudeSDKClient>")
         return ClaudeSDKEngine(client=client)
 
+    if provider in ("openai", "openai_api"):
+        from .providers.openai_api.engine import OpenAIAPIEngine
+
+        # client/config/tools are optional; if client is None, engine loads config
+        # from env and constructs an OpenAI SDK client.
+        return OpenAIAPIEngine(
+            client=kwargs.get("client"),
+            config=kwargs.get("config"),
+            tools=kwargs.get("tools"),
+        )
+
     raise ValueError(f"Unknown LLM provider: {provider}")
