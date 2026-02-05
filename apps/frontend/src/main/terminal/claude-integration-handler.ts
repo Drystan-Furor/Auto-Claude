@@ -1293,16 +1293,8 @@ export async function invokeClaudeAsync(
     // Async CLI invocation - non-blocking
     const cwdCommand = buildCdCommand(cwd, terminal.shellType);
 
-    // Add timeout protection for CLI detection (10s timeout)
-    const cliInvocationPromise = getClaudeCliInvocationAsync();
-    let timeoutId: NodeJS.Timeout | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('CLI invocation timeout after 10s')), 10000);
-    });
-    const { command: claudeCmd, env: claudeEnv } = await Promise.race([cliInvocationPromise, timeoutPromise])
-      .finally(() => {
-        if (timeoutId) clearTimeout(timeoutId);
-      });
+    // CLI detection is async + internally timeout-protected
+    const { command: claudeCmd, env: claudeEnv } = await getClaudeCliInvocationAsync();
 
     const escapedClaudeCmd = escapeShellCommand(claudeCmd);
     const pathPrefix = buildPathPrefix(claudeEnv.PATH || '');
@@ -1387,18 +1379,8 @@ export async function resumeClaudeAsync(
     terminal.isClaudeMode = true;
     SessionHandler.releaseSessionId(terminal.id);
 
-    // Async CLI invocation - non-blocking
-    // Add timeout protection for CLI detection (10s timeout)
-    const cliInvocationPromise = getClaudeCliInvocationAsync();
-    let timeoutId: NodeJS.Timeout | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('CLI invocation timeout after 10s')), 10000);
-    });
-
-    const { command: claudeCmd, env: claudeEnv } = await Promise.race([cliInvocationPromise, timeoutPromise])
-      .finally(() => {
-        if (timeoutId) clearTimeout(timeoutId);
-      });
+    // Async CLI invocation - non-blocking (internally timeout-protected)
+    const { command: claudeCmd, env: claudeEnv } = await getClaudeCliInvocationAsync();
 
     const escapedClaudeCmd = escapeShellCommand(claudeCmd);
     const pathPrefix = buildPathPrefix(claudeEnv.PATH || '');

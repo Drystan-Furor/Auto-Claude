@@ -2,6 +2,7 @@ import path from 'path';
 import { getAugmentedEnv, getAugmentedEnvAsync } from './env-utils';
 import { getToolPath, getToolPathAsync } from './cli-tool-manager';
 import { isWindows, getPathDelimiter } from './platform';
+import { withTimeout } from '../shared/utils/with-timeout';
 
 export type ClaudeCliInvocation = {
   command: string;
@@ -66,13 +67,14 @@ export function getClaudeCliInvocation(): ClaudeCliInvocation {
  */
 export async function getClaudeCliInvocationAsync(): Promise<ClaudeCliInvocation> {
   // Run both detections in parallel for efficiency
-  const [command, env] = await Promise.all([
+  const invocationPromise = Promise.all([
     getToolPathAsync('claude'),
     getAugmentedEnvAsync(),
-  ]);
-
-  return {
+  ]).then(([command, env]) => ({
     command,
     env: ensureCommandDirInPath(command, env),
-  };
+  }));
+
+  // Safety: tool detection should never hang the Electron main process.
+  return withTimeout(invocationPromise, 10_000, 'CLI invocation timeout after 10s');
 }

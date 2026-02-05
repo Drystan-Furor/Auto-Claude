@@ -5,6 +5,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type * as pty from '@lydell/node-pty';
 import type { TerminalProcess } from '../types';
 import { buildCdCommand, escapeShellArg } from '../../../shared/utils/shell-escape';
+import { withTimeout } from '../../../shared/utils/with-timeout';
 
 // Mock the platform module (main/platform/index.ts)
 vi.mock('../../platform', () => ({
@@ -209,6 +210,7 @@ function getConfigDirCommand(platform: 'win32' | 'darwin' | 'linux', configDir: 
 describe('claude-integration-handler', () => {
   beforeEach(() => {
     mockGetClaudeCliInvocation.mockClear();
+    mockGetClaudeCliInvocationAsync.mockClear();
     mockGetClaudeProfileManager.mockClear();
     mockPersistSession.mockClear();
     mockReleaseSessionId.mockClear();
@@ -699,12 +701,18 @@ describe('invokeClaudeAsync', () => {
     });
 
     it('should timeout after 10 seconds if CLI invocation hangs', async () => {
+      vi.useFakeTimers();
+
+      // Simulate a hanging invocation, but keep the timeout behavior (now owned by claude-cli-utils)
       mockGetClaudeCliInvocationAsync.mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({
-          command: '/opt/claude/bin/claude',
-          env: { PATH: '/opt/claude/bin:/usr/bin' },
-        }), 15000))
+        withTimeout(
+          // Never resolves
+          new Promise(() => undefined),
+          10_000,
+          'CLI invocation timeout after 10s'
+        )
       );
+
       const profileManager = {
         getActiveProfile: vi.fn(() => ({ id: 'default', name: 'Default', isDefault: true })),
         getProfile: vi.fn(),
@@ -717,12 +725,18 @@ describe('invokeClaudeAsync', () => {
 
       const { invokeClaudeAsync } = await import('../claude-integration-handler');
 
-      await expect(invokeClaudeAsync(terminal, '/tmp/project', undefined, () => null, vi.fn()))
-        .rejects.toThrow('CLI invocation timeout after 10s');
+      const promise = invokeClaudeAsync(terminal, '/tmp/project', undefined, () => null, vi.fn());
+      const expectation = expect(promise).rejects.toThrow('CLI invocation timeout after 10s');
+
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      await expectation;
 
       // Terminal state should be rolled back
       expect(terminal.isClaudeMode).toBe(false);
-    }, 12000); // Allow 12 seconds for test (10s timeout + 2s buffer)
+
+      vi.useRealTimers();
+    });
 
     it('should reset terminal state on async error', async () => {
       mockGetClaudeCliInvocationAsync.mockRejectedValue(new Error('Async CLI error'));
