@@ -50,9 +50,11 @@ from core.gh_executable import get_gh_executable
 logger = logging.getLogger(__name__)
 
 try:
+    # Normal package import path
     from .file_lock import FileLock, atomic_write
 except (ImportError, ValueError, SystemError):
-    from .file_lock import FileLock, atomic_write
+    # Test runner imports as top-level module (sys.path hack)
+    from file_lock import FileLock, atomic_write
 
 
 @dataclass

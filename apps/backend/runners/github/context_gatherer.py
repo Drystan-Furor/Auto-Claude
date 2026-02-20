@@ -25,13 +25,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 try:
+    # Normal package import path (when imported as apps.backend.runners.github.*)
     from .gh_client import GHClient, PRTooLargeError
     from .services.io_utils import safe_print
 except (ImportError, ValueError, SystemError):
-    # Import from core.io_utils directly to avoid circular import with services package
-    # (services/__init__.py imports pr_review_engine which imports context_gatherer)
+    # Tests often import this module as a *top-level* file by adding
+    # apps/backend and apps/backend/runners/github to sys.path.
+    # In that mode, relative imports (from .x import y) fail with
+    # "attempted relative import with no known parent package".
     from core.io_utils import safe_print
-    from .gh_client import GHClient, PRTooLargeError
+    from gh_client import GHClient, PRTooLargeError
 
 # Validation patterns for git refs and paths (defense-in-depth)
 # These patterns allow common valid characters while rejecting potentially dangerous ones
@@ -1342,8 +1345,13 @@ class FollowupContextGatherer:
         Returns:
             FollowupReviewContext with changes since last review
         """
-        # Import here to avoid circular imports
-        from .models import FollowupReviewContext
+        # Import here to avoid circular imports.
+        # Tests may import this module top-level (sys.path hack), in which case
+        # relative imports fail.
+        try:
+            from .models import FollowupReviewContext
+        except (ImportError, ValueError, SystemError):
+            from models import FollowupReviewContext
 
         previous_sha = self.previous_review.reviewed_commit_sha
 

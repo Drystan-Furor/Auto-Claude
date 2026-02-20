@@ -22,9 +22,8 @@ import hashlib
 import logging
 import os
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 # Note: AgentDefinition import kept for backwards compatibility but no longer used
 # The Task tool's custom subagent_type feature is broken in Claude Code CLI
@@ -33,28 +32,56 @@ from claude_agent_sdk import AgentDefinition  # noqa: F401
 
 from core.client import create_client
 from phase_config import get_thinking_budget, resolve_model_id
-from ..context_gatherer import PRContext, _validate_git_ref
-from ..gh_client import GHClient
-from ..models import (
-    BRANCH_BEHIND_BLOCKER_MSG,
-    BRANCH_BEHIND_REASONING,
-    GitHubRunnerConfig,
-    MergeVerdict,
-    PRReviewFinding,
-    PRReviewResult,
-    ReviewSeverity,
-)
-from .agent_utils import create_working_dir_injector
-from .category_utils import map_category
-from .io_utils import safe_print
-from .pr_worktree_manager import PRWorktreeManager
-from .pydantic_models import (
-    AgentAgreement,
-    FindingValidationResponse,
-    ParallelOrchestratorResponse,
-    SpecialistResponse,
-)
-from .sdk_utils import process_sdk_stream
+
+try:
+    # Normal package imports
+    from ..context_gatherer import PRContext, _validate_git_ref
+    from ..gh_client import GHClient
+    from ..models import (
+        BRANCH_BEHIND_BLOCKER_MSG,
+        BRANCH_BEHIND_REASONING,
+        GitHubRunnerConfig,
+        MergeVerdict,
+        PRReviewFinding,
+        PRReviewResult,
+        ReviewSeverity,
+    )
+    from .agent_utils import create_working_dir_injector
+    from .category_utils import map_category
+    from .io_utils import safe_print
+    from .pr_worktree_manager import PRWorktreeManager
+    from .pydantic_models import (
+        AgentAgreement,
+        FindingValidationResponse,
+        ParallelOrchestratorResponse,
+        SpecialistResponse,
+    )
+    from .sdk_utils import process_sdk_stream
+except (ImportError, ValueError, SystemError):
+    # Some tests load this file via importlib.spec_from_file_location(), which
+    # means relative imports don't work. Fall back to absolute package imports.
+    from runners.github.context_gatherer import PRContext, _validate_git_ref
+    from runners.github.gh_client import GHClient
+    from runners.github.models import (
+        BRANCH_BEHIND_BLOCKER_MSG,
+        BRANCH_BEHIND_REASONING,
+        GitHubRunnerConfig,
+        MergeVerdict,
+        PRReviewFinding,
+        PRReviewResult,
+        ReviewSeverity,
+    )
+    from runners.github.services.agent_utils import create_working_dir_injector
+    from runners.github.services.category_utils import map_category
+    from runners.github.services.io_utils import safe_print
+    from runners.github.services.pr_worktree_manager import PRWorktreeManager
+    from runners.github.services.pydantic_models import (
+        AgentAgreement,
+        FindingValidationResponse,
+        ParallelOrchestratorResponse,
+        SpecialistResponse,
+    )
+    from runners.github.services.sdk_utils import process_sdk_stream
 
 
 # =============================================================================
@@ -62,9 +89,13 @@ from .sdk_utils import process_sdk_stream
 # =============================================================================
 
 
-@dataclass
-class SpecialistConfig:
-    """Configuration for a specialist agent in parallel SDK sessions."""
+class SpecialistConfig(NamedTuple):
+    """Configuration for a specialist agent in parallel SDK sessions.
+
+    Note: this is a NamedTuple (not a dataclass) so it remains robust when this
+    module is loaded via importlib.spec_from_file_location() in tests (where the
+    module might not be registered in sys.modules early enough for @dataclass).
+    """
 
     name: str
     prompt_file: str

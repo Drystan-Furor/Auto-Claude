@@ -10,7 +10,11 @@ This module provides a centralized category mapping system used across all PR re
 
 from __future__ import annotations
 
-from ..models import ReviewCategory
+try:
+    from ..models import ReviewCategory
+except (ImportError, ValueError, SystemError):
+    # Loaded as a top-level module in some tests
+    from models import ReviewCategory
 
 
 # Map AI-generated category names to valid ReviewCategory enum values

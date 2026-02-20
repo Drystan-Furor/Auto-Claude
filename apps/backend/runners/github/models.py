@@ -17,9 +17,12 @@ from enum import Enum
 from pathlib import Path
 
 try:
+    # Normal package import path (when imported as apps.backend.runners.github.*)
     from .file_lock import locked_json_update, locked_json_write
 except (ImportError, ValueError, SystemError):
-    from .file_lock import locked_json_update, locked_json_write
+    # Tests sometimes import this module as top-level (sys.path hack), which
+    # breaks relative imports.
+    from file_lock import locked_json_update, locked_json_write
 
 
 class ReviewSeverity(str, Enum):
